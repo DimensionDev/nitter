@@ -11,7 +11,7 @@ import views/[general, about]
 import routes/[
   preferences, timeline, status, media, search, rss, list, debug,
   unsupported, embed, resolver, router_utils]
-import jsons/[health, timeline, list, search]
+import jsons/[health, timeline, list, search, status]
 
 const instancesUrl = "https://github.com/zedeus/nitter/wiki/Instances"
 const issuesUrl = "https://github.com/zedeus/nitter/issues"
@@ -59,6 +59,8 @@ createDebugRouter(cfg)
 createJsonApiHealthRouter(cfg)
 createJsonApiListRouter(cfg)
 createJsonApiTimelineRouter(cfg)
+createJsonApiSearchRouter(cfg)
+createJsonApiStatusRouter(cfg)
 
 settings:
   port = Port(cfg.port)
@@ -111,6 +113,7 @@ routes:
   extend jsonapi_list, ""
   extend jsonapi_timeline, ""
   extend jsonapi_search, ""
+  extend jsonapi_status, ""
   extend rss, ""
   extend status, ""
   extend search, ""
