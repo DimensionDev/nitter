@@ -53,7 +53,7 @@ proc formatConversationAsJson*(conv: Conversation): JsonNode =
 
 proc createJsonApiStatusRouter*(cfg: Config) =
   router jsonapi_status:
-    get "/@name/status/@id/?":
+    get "/api/@name/status/@id/?":
       cond '.' notin @"name"
       let id = @"id"
 
@@ -72,16 +72,16 @@ proc createJsonApiStatusRouter*(cfg: Config) =
 
       respJsonSuccess formatConversationAsJson(conv)
 
-    get "/@name/@s/@id/@m/?@i?":
+    get "/api/@name/@s/@id/@m/?@i?":
       cond @"s" in ["status", "statuses"]
       cond @"m" in ["video", "photo"]
       redirect("/api/$1/status/$2" % [@"name", @"id"])
 
-    get "/@name/statuses/@id/?":
+    get "/api/@name/statuses/@id/?":
       redirect("/api/$1/status/$2" % [@"name", @"id"])
 
-    get "/i/web/status/@id":
+    get "/api/i/web/status/@id":
       redirect("/api/i/status/" & @"id")
 
-    get "/@name/thread/@id/?":
+    get "/api/@name/thread/@id/?":
       redirect("/api/$1/status/$2" % [@"name", @"id"])
