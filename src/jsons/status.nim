@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, strutils, sequtils, uri, options, sugar
+import json, asyncdispatch, strutils, sequtils, uri, options, sugar
 
 import jester, karax/vdom
 
