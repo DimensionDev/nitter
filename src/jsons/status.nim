@@ -24,11 +24,11 @@ proc formatConversationAsJson*(conv: Conversation): JsonNode =
 
   # Format reply chains
   for chain in conv.replies.content:
-    var chainTweets = newJArray()
+    var tweets = newJArray()
     for tweet in chain.content:
-      chainTweets.add(formatTweetAsJson(tweet))
+      tweets.add(formatTweetAsJson(tweet))
     replies.add(%*{
-      "tweets": chainTweets,
+      "tweets": tweets,
       "hasMore": chain.hasMore,
       "cursor": chain.cursor
     })
@@ -47,7 +47,7 @@ proc formatConversationAsJson*(conv: Conversation): JsonNode =
       "beginning": conv.replies.beginning,
       "top": conv.replies.top,
       "bottom": conv.replies.bottom,
-      "chains": replies
+      "tweets": replies
     }
   }
 
@@ -58,7 +58,7 @@ proc createJsonApiStatusRouter*(cfg: Config) =
       let id = @"id"
 
       if id.len > 19 or id.any(c => not c.isDigit):
-        respJsonError Http404, "Invalid tweet ID"
+        respJsonError "Invalid tweet ID"
 
       let conv = await getTweet(id, getCursor())
       if conv == nil:
@@ -68,7 +68,7 @@ proc createJsonApiStatusRouter*(cfg: Config) =
         var error = "Tweet not found"
         if conv != nil and conv.tweet != nil and conv.tweet.tombstone.len > 0:
           error = conv.tweet.tombstone
-        respJsonError Http404, error
+        respJsonError error
 
       respJsonSuccess formatConversationAsJson(conv)
 

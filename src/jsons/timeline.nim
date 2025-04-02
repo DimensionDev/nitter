@@ -121,7 +121,7 @@ proc createJsonApiTimelineRouter*(cfg: Config) =
       if username.len > 0:
         respJsonSuccess formatUserName(username)
       else:
-        respJsonError Http404, "User not found"
+        respJsonError "User not found"
 
     get "/api/@name/profile":
       cond @"name" notin ["pic", "gif", "video", "search", "settings", "login",
@@ -135,7 +135,7 @@ proc createJsonApiTimelineRouter*(cfg: Config) =
         query.fromUser = names
 
       var profile = await fetchProfile("", query, skipRail = false)
-      if profile.user.username.len == 0: respJsonError Http404, "User not found"
+      if profile.user.username.len == 0: respJsonError "User not found"
 
       respJsonSuccess formatProfileAsJson(profile)
 
@@ -155,11 +155,11 @@ proc createJsonApiTimelineRouter*(cfg: Config) =
 
       if query.fromUser.len != 1:
         var timeline = await getGraphTweetSearch(query, after)
-        if timeline.content.len == 0: respJsonError Http404, "No results found"
+        if timeline.content.len == 0: respJsonError "No results found"
         timeline.beginning = true
         respJsonSuccess formatTimelineAsJson(timeline)
       else:
         var profile = await fetchProfile(after, query, skipRail = true)
-        if profile.tweets.content.len == 0: respJsonError Http404, "User not found"
+        if profile.tweets.content.len == 0: respJsonError "User not found"
         profile.tweets.beginning = true
         respJsonSuccess formatTimelineAsJson(profile.tweets)
