@@ -24,14 +24,8 @@ proc formatConversationAsJson*(conv: Conversation): JsonNode =
 
   # Format reply chains
   for chain in conv.replies.content:
-    var tweets = newJArray()
     for tweet in chain.content:
-      tweets.add(formatTweetAsJson(tweet))
-    replies.add(%*{
-      "tweets": tweets,
-      "hasMore": chain.hasMore,
-      "cursor": chain.cursor
-    })
+      replies.add(formatTweetAsJson(tweet))
 
   return %*{
     "tweet": formatTweetAsJson(conv.tweet),
