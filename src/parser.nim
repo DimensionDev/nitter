@@ -267,7 +267,9 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
           else:
             result.attribution = some(parseGraphUser(user))
       of "animated_gif":
-        result.gif = some(parseGif(m))
+        let gif = parseGif(m)
+        result.gif = some(gif)
+        result.gifs.add gif
       else: discard
 
       with url, m{"url"}:
@@ -400,6 +402,7 @@ proc parseGraphConversation*(js: JsonNode; tweetId: string; v2=true): Conversati
 
 proc parseGraphTimeline*(js: JsonNode; root: string; after=""): Profile =
   result = Profile(tweets: Timeline(beginning: after.len == 0))
+  echo "json str", js
 
   let instructions =
     if root == "list": ? js{"data", "list", "timeline_response", "timeline", "instructions"}

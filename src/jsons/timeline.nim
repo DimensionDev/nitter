@@ -64,6 +64,7 @@ proc formatTweetAsJson*(tweet: Tweet): JsonNode =
     "card": if tweet.card.isSome: %*get(tweet.card) else: newJNull(),
     "poll": if tweet.poll.isSome: %*get(tweet.poll) else: newJNull(),
     "gif": if tweet.gif.isSome: %*get(tweet.gif) else: newJNull(),
+    "gifs": if tweet.gifs.len > 0: %tweet.gifs else: newJNull(),
     "video": if tweet.video.isSome: %*get(tweet.video) else: newJNull(),
     "photos": if tweet.photos.len > 0: %tweet.photos else: newJNull()
   }
