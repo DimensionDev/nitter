@@ -212,6 +212,7 @@ type
     card*: Option[Card]
     poll*: Option[Poll]
     gif*: Option[Gif]
+    gifs*: seq[Gif]
     video*: Option[Video]
     photos*: seq[string]
 
