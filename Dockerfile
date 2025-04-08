@@ -1,4 +1,4 @@
-FROM nimlang/nim:2.2.0-alpine-regular as nim
+FROM nimlang/nim@sha256:9407f830da4a9138346b3808a54d2bbe4e63122b2d6418c28f6df3be7a4ccf5c AS nim
 LABEL maintainer="setenforce@protonmail.com"
 
 RUN apk --no-cache add libsass-dev pcre
