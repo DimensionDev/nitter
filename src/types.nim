@@ -146,6 +146,9 @@ type
     votes*: int
     leader*: int
     status*: string
+    url*: string
+    endTime*: string
+    durationMinutes*: string
 
   CardKind* = enum
     amplify = "amplify"

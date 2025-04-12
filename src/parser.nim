@@ -73,6 +73,9 @@ proc parsePoll(js: JsonNode): Poll =
 
   result.leader = result.values.find(max(result.values))
   result.votes = result.values.sum
+  result.url = js{"url"}.getStr
+  result.endTime = vals{"end_datetime_utc", "string_value"}.getStr
+  result.durationMinutes = vals{"duration_minutes", "string_value"}.getStr
 
 proc parseGif(js: JsonNode): Gif =
   result = Gif(
