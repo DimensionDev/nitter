@@ -109,6 +109,7 @@ proc renderVideo*(video: Video; prefs: Prefs; path: string): VNode =
             video(poster=thumb, data-url=source, data-autoload="false", muted=prefs.muteVideos)
             verbatim "<div class=\"video-overlay\" onclick=\"playVideo(this)\">"
             tdiv(class="overlay-circle"): span(class="overlay-triangle")
+            tdiv(class="overlay-duration"): text getDuration(video)
             verbatim "</div>"
       if container.len > 0:
         tdiv(class="card-content"):
@@ -178,14 +179,12 @@ func formatStat(stat: int): string =
   if stat > 0: insertSep($stat, ',')
   else: ""
 
-proc renderStats(stats: TweetStats; views: string): VNode =
+proc renderStats(stats: TweetStats): VNode =
   buildHtml(tdiv(class="tweet-stats")):
     span(class="tweet-stat"): icon "comment", formatStat(stats.replies)
     span(class="tweet-stat"): icon "retweet", formatStat(stats.retweets)
-    span(class="tweet-stat"): icon "quote", formatStat(stats.quotes)
     span(class="tweet-stat"): icon "heart", formatStat(stats.likes)
-    if views.len > 0:
-      span(class="tweet-stat"): icon "play", insertSep(views, ',')
+    span(class="tweet-stat"): icon "views", formatStat(stats.views)
 
 proc renderReply(tweet: Tweet): VNode =
   buildHtml(tdiv(class="replying-to")):
@@ -274,7 +273,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
     divClass = "thread-last " & class
 
   if not tweet.available:
-    return buildHtml(tdiv(class=divClass & "unavailable timeline-item")):
+    return buildHtml(tdiv(class=divClass & "unavailable timeline-item", data-username=tweet.user.username)):
       tdiv(class="unavailable-box"):
         if tweet.tombstone.len > 0:
           text tweet.tombstone
@@ -296,12 +295,11 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
     tweet = tweet.retweet.get
     retweet = fullTweet.user.fullname
 
-  buildHtml(tdiv(class=("timeline-item " & divClass))):
+  buildHtml(tdiv(class=("timeline-item " & divClass), data-username=tweet.user.username)):
     if not mainTweet:
       a(class="tweet-link", href=getLink(tweet))
 
     tdiv(class="tweet-body"):
-      var views = ""
       renderHeader(tweet, retweet, pinned, prefs)
 
       if not afterTweet and index == 0 and tweet.reply.len > 0 and
@@ -325,10 +323,8 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
         renderAlbum(tweet)
       elif tweet.video.isSome:
         renderVideo(tweet.video.get(), prefs, path)
-        views = tweet.video.get().views
       elif tweet.gif.isSome:
         renderGif(tweet.gif.get(), prefs)
-        views = "GIF"
 
       if tweet.poll.isSome:
         renderPoll(tweet.poll.get())
@@ -343,7 +339,7 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
         renderMediaTags(tweet.mediaTags)
 
       if not prefs.hideTweetStats:
-        renderStats(tweet.stats, views)
+        renderStats(tweet.stats)
 
       if showThread:
         a(class="show-thread", href=("/i/status/" & $tweet.threadId)):
