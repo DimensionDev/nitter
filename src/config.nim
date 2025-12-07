@@ -41,7 +41,9 @@ proc getConfig*(path: string): (Config, parseCfg.Config) =
     enableJsonApi: cfg.get("Config", "enableJsonApi", true),
     enableDebug: cfg.get("Config", "enableDebug", false),
     proxy: cfg.get("Config", "proxy", ""),
-    proxyAuth: cfg.get("Config", "proxyAuth", "")
+    proxyAuth: cfg.get("Config", "proxyAuth", ""),
+    apiProxy: cfg.get("Config", "apiProxy", ""),
+    disableTid: cfg.get("Config", "disableTid", false)
   )
 
   return (conf, cfg)
