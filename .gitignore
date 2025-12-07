@@ -16,3 +16,6 @@ nitter.conf
 guest_accounts.json*
 sessions.json*
 dump.rdb
+
+node_modules
+debug_responses
