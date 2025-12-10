@@ -115,7 +115,7 @@ proc formatProfileAsJson*(profile: Profile): JsonNode =
 
 proc createJsonApiTimelineRouter*(cfg: Config) =
   router jsonapi_timeline:
-    get "/api/i/user/@user_id/?":
+    get "/api/i/user/@user_id":
       cond @"user_id".len > 0
       let username = await getCachedUsername(@"user_id")
       if username.len > 0:
@@ -141,8 +141,8 @@ proc createJsonApiTimelineRouter*(cfg: Config) =
 
     get "/api/@name/?@tab?/?":
       cond '.' notin @"name"
-      cond @"name" notin ["pic", "gif", "video", "search", "settings", "login",
-          "intent", "i"]
+      cond @"name" notin ["pic", "gif", "video", "search", "settings", "login", "intent", "i"]
+      cond @"name".allCharsInSet({'a'..'z', 'A'..'Z', '0'..'9', '_', ','})
       cond @"tab" in ["with_replies", "media", "search", ""]
       let
         prefs = cookiePrefs()
