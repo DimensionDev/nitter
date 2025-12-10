@@ -142,7 +142,10 @@ proc getCachedUsername*(userId: string): Future[string] {.async.} =
   if username != redisNil:
     result = username
   else:
+    echo "getGraphUserById: ", userId
     let user = await getGraphUserById(userId)
+    echo "user: ", user
+
     result = user.username
     await setEx(key, baseCacheTime, result)
     if result.len > 0 and user.id.len > 0:
