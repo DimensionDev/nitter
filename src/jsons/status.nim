@@ -55,8 +55,6 @@ proc createJsonApiStatusRouter*(cfg: Config) =
         respJsonError "Invalid tweet ID"
 
       let conv = await getTweet(id, getCursor())
-      if conv == nil:
-        echo "nil conv"
 
       if conv == nil or conv.tweet == nil or conv.tweet.id == 0:
         var error = "Tweet not found"
