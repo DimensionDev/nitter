@@ -60,7 +60,7 @@ proc createJsonApiStatusRouter*(cfg: Config) =
         var error = "Tweet not found"
         if conv != nil and conv.tweet != nil and conv.tweet.tombstone.len > 0:
           error = conv.tweet.tombstone
-        respJsonError error
+        respJsonError(error, "not_found", Http404)
 
       respJsonSuccess formatConversationAsJson(conv)
 

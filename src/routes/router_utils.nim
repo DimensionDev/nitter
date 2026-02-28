@@ -53,12 +53,14 @@ template respJsonSuccess*(data: JsonNode) =
   }
   resp $successResponse, "application/json"
 
-template respJsonError*(message: string) =
-  let errorResponse = %*{
+template respJsonError*(message: string, errorType: string = "", httpCode: HttpCode = Http200) =
+  var errorResponse = %*{
     "code": -1,
     "error": message
   }
-  resp $errorResponse, "application/json"
+  if errorType.len > 0:
+    errorResponse["error_type"] = %errorType
+  resp httpCode, $errorResponse, "application/json"
 
 template respJsonNull*() =
   let nullResponse = newJNull()
