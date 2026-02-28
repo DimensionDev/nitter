@@ -14,7 +14,7 @@ proc createJsonApiSearchRouter*(cfg: Config) =
     get "/api/search?":
       let q = @"q"
       if q.len > 500:
-        respJsonError "Search input too long."
+        respJsonError("Search input too long.", "invalid_input", Http400)
 
       let
         prefs = cookiePrefs()
@@ -23,7 +23,7 @@ proc createJsonApiSearchRouter*(cfg: Config) =
       case query.kind
       of users:
         if "," in q:
-          respJsonError "Invalid search input"
+          respJsonError("Invalid search input", "invalid_input", Http400)
         var users: Result[User]
         try:
           users = await getGraphUserSearch(query, getCursor())
@@ -32,10 +32,10 @@ proc createJsonApiSearchRouter*(cfg: Config) =
         respJsonSuccess formatUsersAsJson(users)
       of tweets:
         let timeline = await getGraphTweetSearch(query, getCursor())
-        if timeline.content.len == 0: respJsonError "No results found"
+        if timeline.content.len == 0: respJsonError("No results found", "no_results", Http200)
         respJsonSuccess formatTimelineAsJson(timeline)
       else:
-        respJsonError "Invalid search"
+        respJsonError("Invalid search", "invalid_input", Http400)
 
     get "/api/hashtag/@hash":
       redirect("/search?q=" & encodeUrl("#" & @"hash"))

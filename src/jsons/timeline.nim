@@ -155,7 +155,7 @@ proc createJsonApiTimelineRouter*(cfg: Config) =
 
       if query.fromUser.len != 1:
         var timeline = await getGraphTweetSearch(query, after)
-        if timeline.content.len == 0: respJsonError "No results found"
+        if timeline.content.len == 0: respJsonError("No results found", "no_results", Http200)
         timeline.beginning = true
         respJsonSuccess formatTimelineAsJson(timeline)
       else:

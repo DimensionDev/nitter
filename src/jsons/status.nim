@@ -52,7 +52,7 @@ proc createJsonApiStatusRouter*(cfg: Config) =
       let id = @"id"
 
       if id.len > 19 or id.any(c => not c.isDigit):
-        respJsonError "Invalid tweet ID"
+        respJsonError("Invalid tweet ID", "invalid_input", Http400)
 
       let conv = await getTweet(id, getCursor())
 
