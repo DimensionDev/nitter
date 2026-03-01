@@ -197,7 +197,10 @@ proc fetchRaw*(req: ApiReq): Future[string] {.async.} =
     var session = await getAndValidateSession(req)
     let url = req.toUrl(session.kind)
 
+    echo "fetchRaw url: ", url
+
     fetchImpl result:
+      echo "fetchRaw result: ", result
       if not (result.startsWith('{') or result.startsWith('[')):
         echo resp.status, ": ", result, " --- url: ", url
         result.setLen(0)
