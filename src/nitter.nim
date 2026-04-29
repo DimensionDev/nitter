@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-import asyncdispatch, strformat, logging
+import asyncdispatch, strformat, logging, re
 from net import Port
 from htmlgen import a
 from os import getEnv
@@ -71,6 +71,18 @@ settings:
   reusePort = true
 
 routes:
+  # CORS preflight handler for API routes
+  options re"/api/.*":
+    let origin = if request.headers.hasKey("Origin"): request.headers["Origin"] else: "*"
+    resp Http204, {
+      "Vary": "Origin",
+      "Access-Control-Allow-Origin": origin,
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, DNT",
+      "Access-Control-Allow-Credentials": "true",
+      "Access-Control-Max-Age": "300"
+    }, ""
+
   get "/":
     resp renderMain(renderSearch(), request, cfg, themePrefs())
 

@@ -43,25 +43,51 @@ template getCursor*(req: Request): string =
 proc getNames*(name: string): seq[string] =
   name.strip(chars={'/'}).split(",").filterIt(it.len > 0)
 
+template corsOrigin*(): string {.dirty.} =
+  if request.headers.hasKey("Origin"): request.headers["Origin"] else: "*"
+
 template respJson*(node: JsonNode) =
-  resp $node, "application/json"
+  let origin = corsOrigin()
+  resp Http200, {
+    "Content-Type": "application/json",
+    "Vary": "Origin",
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Credentials": "true"
+  }, $node
 
 template respJsonSuccess*(data: JsonNode) =
+  let origin = corsOrigin()
   let successResponse = %*{
     "code": 0,
     "data": data
   }
-  resp $successResponse, "application/json"
+  resp Http200, {
+    "Content-Type": "application/json",
+    "Vary": "Origin",
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Credentials": "true"
+  }, $successResponse
 
 template respJsonError*(message: string, errorType: string = "", httpCode: HttpCode = Http200) =
+  let origin = corsOrigin()
   var errorResponse = %*{
     "code": -1,
     "error": message
   }
   if errorType.len > 0:
     errorResponse["error_type"] = %errorType
-  resp httpCode, $errorResponse, "application/json"
+  resp httpCode, {
+    "Content-Type": "application/json",
+    "Vary": "Origin",
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Credentials": "true"
+  }, $errorResponse
 
 template respJsonNull*() =
-  let nullResponse = newJNull()
-  resp $nullResponse, "application/json"
+  let origin = corsOrigin()
+  resp Http200, {
+    "Content-Type": "application/json",
+    "Vary": "Origin",
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Credentials": "true"
+  }, $newJNull()
