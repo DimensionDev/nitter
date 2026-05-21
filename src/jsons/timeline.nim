@@ -63,10 +63,9 @@ proc formatTweetAsJson*(tweet: Tweet): JsonNode =
         tweet.quote)) else: newJNull(),
     "card": if tweet.card.isSome: %*get(tweet.card) else: newJNull(),
     "poll": if tweet.poll.isSome: %*get(tweet.poll) else: newJNull(),
-    "gif": if tweet.gif.isSome: %*get(tweet.gif) else: newJNull(),
-    "gifs": if tweet.gifs.len > 0: %tweet.gifs else: newJNull(),
-    "video": if tweet.video.isSome: %*get(tweet.video) else: newJNull(),
-    "photos": if tweet.photos.len > 0: %tweet.photos else: newJNull()
+    "photos": (if tweet.hasPhotos: %tweet.getPhotos else: newJNull()),
+    "videos": (if tweet.hasVideos: %tweet.getVideos else: newJNull()),
+    "gifs": (if tweet.hasGifs: %tweet.media.filterIt(it.kind == gifMedia).mapIt(it.gif) else: newJNull())
   }
 
 proc formatTimelineAsJson*(results: Timeline): JsonNode =
@@ -127,10 +126,10 @@ proc createJsonApiTimelineRouter*(cfg: Config) =
       cond @"name" notin ["pic", "gif", "video", "search", "settings", "login",
           "intent", "i"]
       let
-        prefs = cookiePrefs()
+        prefs = requestPrefs()
         names = getNames(@"name")
 
-      var query = request.getQuery("", @"name")
+      var query = request.getQuery("", @"name", prefs)
       if names.len != 1:
         query.fromUser = names
 
@@ -145,11 +144,11 @@ proc createJsonApiTimelineRouter*(cfg: Config) =
       cond @"name".allCharsInSet({'a'..'z', 'A'..'Z', '0'..'9', '_', ','})
       cond @"tab" in ["with_replies", "media", "search", ""]
       let
-        prefs = cookiePrefs()
+        prefs = requestPrefs()
         after = getCursor()
         names = getNames(@"name")
 
-      var query = request.getQuery(@"tab", @"name")
+      var query = request.getQuery(@"tab", @"name", prefs)
       if names.len != 1:
         query.fromUser = names
 
