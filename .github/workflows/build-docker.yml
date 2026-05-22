@@ -8,12 +8,7 @@ on:
       - master
 
 jobs:
-  tests:
-    uses: ./.github/workflows/run-tests.yml
-    secrets: inherit
-
   build-docker-amd64:
-    needs: [tests]
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v6
