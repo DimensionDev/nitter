@@ -5,7 +5,7 @@ import jester
 
 import ".."/routes/router_utils
 import ".."/[types, redis_cache]
-import list
+import list, timeline
 
 proc formatBroadcastAsJson*(bc: Broadcast): JsonNode =
   proc dateToUnix(dt: DateTime): int64 =
