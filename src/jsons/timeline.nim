@@ -95,7 +95,7 @@ proc formatTweetAsJson*(tweet: Tweet): JsonNode =
     "isAI": %tweet.isAI
   }
 
-proc formatTimelineAsJson*(results: Timeline): JsonNode =
+proc formatTimelineAsJson*(results: Timeline; pinned = none(Tweet)): JsonNode =
   var retweets: seq[int64]
   var timeline = newJArray()
 
@@ -117,7 +117,7 @@ proc formatTimelineAsJson*(results: Timeline): JsonNode =
         threadTimeline.add(formatTweetAsJson(tweet))
       timeline.add(threadTimeline)
 
-  return %*{
+  result = %*{
     "pagination": %*{
       "beginning": results.beginning,
       "top": results.top,
@@ -125,6 +125,12 @@ proc formatTimelineAsJson*(results: Timeline): JsonNode =
     },
     "timeline": timeline
   }
+
+  # The pinned tweet is a byproduct of the first-page timeline fetch
+  # (only set when there is no cursor), so include it here to avoid a
+  # redundant upstream fetch via the profile endpoint.
+  if pinned.isSome:
+    result["pinned"] = formatTweetAsJson(get(pinned))
 
 proc formatUserName*(username: string): JsonNode =
   return %*{
@@ -221,4 +227,4 @@ proc createJsonApiTimelineRouter*(cfg: Config) =
         var profile = await fetchProfile(after, query, skipRail = true)
         if profile.tweets.content.len == 0: respJsonError("User not found", "not_found", Http404)
         profile.tweets.beginning = true
-        respJsonSuccess formatTimelineAsJson(profile.tweets)
+        respJsonSuccess formatTimelineAsJson(profile.tweets, profile.pinned)

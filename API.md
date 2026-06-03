@@ -146,6 +146,7 @@ Get user's timeline with optional tab filter.
 |------------|--------|--------------------------------|
 | pagination | object | Pagination information         |
 | timeline   | array  | Array of tweets                |
+| pinned     | object | User's pinned tweet, present only on the first page (no cursor) of the default tab |
 
 ### GET /api/i/user/@user_id
 
