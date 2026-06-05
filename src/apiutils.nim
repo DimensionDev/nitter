@@ -178,13 +178,19 @@ template fetchImpl(result, fetchBody) {.dirty.} =
     release(session)
 
 template retry(bod) =
-  for i in 0 ..< maxRetries:
+  let attempts = max(maxRetries, 1)
+  for i in 0 ..< attempts:
     try:
       bod
       break
     except RateLimitError:
       echo "[sessions] Rate limited, retrying ", req.cookie.endpoint,
-           " request (", i, "/", maxRetries, ")..."
+           " request (", i + 1, "/", attempts, ")..."
+      # Re-raise on the final attempt so the error propagates to Jester's
+      # RateLimitError handler. Swallowing it would let fetch/fetchRaw return
+      # a nil JsonNode, which the parsers dereference -> SIGSEGV in -d:danger.
+      if i == attempts - 1:
+        raise
       if retryDelayMs > 0:
         await sleepAsync(retryDelayMs)
 
