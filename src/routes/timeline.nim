@@ -67,6 +67,9 @@ proc fetchProfile*(after: string; query: Query; skipRail=false): Future[Profile]
     else: Profile(tweets: await getGraphTweetSearch(query, after))
 
   result.user = await user
+  # The cached uid outlives a suspension, so the refetched user arrives without a username.
+  if result.user.suspended and result.user.username.len == 0:
+    result.user.username = name
   result.photoRail = await rail
   result.accountInfo = await info
 
