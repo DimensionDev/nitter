@@ -200,7 +200,8 @@ proc createJsonApiTimelineRouter*(cfg: Config) =
         query.fromUser = names
 
       var profile = await fetchProfile("", query, skipRail = false)
-      if profile.user.username.len == 0: respJsonError("User not found", "not_found", Http404)
+      if profile.user.id.len == 0 and not profile.user.suspended:
+        respJsonError("User not found", "not_found", Http404)
 
       respJsonSuccess formatProfileAsJson(profile)
 
